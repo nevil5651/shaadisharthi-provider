@@ -1,0 +1,73 @@
+<main id="main" class="main">
+  <div class="pagetitle">
+    <h1>Pending Bookings</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">Home</li>
+        <li class="breadcrumb-item active">Bookings</li>
+      </ol>
+    </nav>
+  </div>
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Bookings List</h5>
+
+            <!-- Loading Spinner (Kept Angular Material) -->
+            <div *ngIf="loading && !bookings.length" class="text-center py-4">
+              <mat-spinner diameter="40"></mat-spinner>
+            </div>
+
+            <!-- Virtual Scroll Table (Functionality Preserved) -->
+            <cdk-virtual-scroll-viewport 
+              *ngIf="bookings.length" 
+              itemSize="50" 
+              class="viewport styled-viewport"
+              (scrolledIndexChange)="onScroll()">
+              
+              <table class="table datatable styled-table">
+                <thead>
+                  <tr>
+                    <th>Booking ID</th>
+                    <th>Customer</th>
+                    <th>Service</th>
+                    <th>Date</th>
+                    <th>Price</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *cdkVirtualFor="let booking of bookings">
+                    <td>#{{booking.bookingId}}</td>
+                    <td>{{booking.customerName}}</td>
+                    <td>{{booking.serviceName}}</td>
+                    <td>{{booking.eventStartDate | date:'mediumDate'}}</td>
+                    <td>{{booking.totalAmount | currency}}</td>
+                    <td>
+                      <div class="btn-group">
+                        <button class="btn btn-success btn-sm" (click)="acceptBooking(booking.bookingId)">
+                          <i class="bi bi-check-circle"></i> Accept
+                        </button>
+                        <button class="btn btn-danger btn-sm" (click)="rejectBooking(booking.bookingId)">
+                          <i class="bi bi-x-circle"></i> Reject
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </cdk-virtual-scroll-viewport>
+
+            <!-- Empty State -->
+            <div *ngIf="!loading && !bookings.length" class="text-center py-4 text-muted">
+              No pending bookings found.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>

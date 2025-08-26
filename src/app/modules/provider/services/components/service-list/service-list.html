@@ -1,0 +1,65 @@
+<main id="main" class="main">
+        <div class="pagetitle">
+            <h1>Services</h1>
+            <nav class="d-flex justify-content-between">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                    <li class="breadcrumb-item active">Services</li>
+                </ol>
+                <a [routerLink]="['./add']"><button type="button" class="btn btn-primary">Add Service</button></a>
+            </nav>
+        </div>
+
+        <section class="section dashboard">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Service List</h5>
+
+                    <!-- Loading Spinner -->
+                    <div *ngIf="isLoading$ | async" class="d-flex justify-content-center my-4">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+
+                    <!-- Table and Empty State -->
+                    <ng-container *ngIf="(isLoading$ | async) === false">
+                        <div class="table-responsive" *ngIf="(services$ | async) as services">
+                            <table class="table table-hover" *ngIf="services.length > 0; else noServices">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Sr. No.</th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Category</th>
+                                        <th scope="col">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let service of services; index as i">
+                                        <th scope="row">{{ i + 1 }}</th>
+                                        <td>{{ service.name }}</td>
+                                        <td>{{ service.category }}</td>
+                                        <td>
+                                            <a [routerLink]="['./view', service.id]" class="btn btn-primary btn-sm rounded-0 me-2" title="Details">
+                                               View <i class="ri-eye-fill"></i>
+                                            </a>
+                                            <button (click)="editService(service.id)" class="btn btn-success btn-sm rounded-0" title="Edit">
+                                                Edit <i class="bx bxs-edit"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Message for when no services are found -->
+                        <ng-template #noServices>
+                            <div class="alert alert-info text-center mt-3" role="alert">
+                                No services found. Click 'Add Service' to register one.
+                            </div>
+                        </ng-template>
+                    </ng-container>
+                </div>
+            </div>
+        </section>
+    </main>
