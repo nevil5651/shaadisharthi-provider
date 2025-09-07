@@ -40,16 +40,6 @@ export class SidebarComponent {
       icon: 'bi bi-box-arrow-in-right'
     },
     {
-      path: '/transactions',
-      title: 'Transactions',
-      icon: 'bi bi-credit-card-2-front'
-    },
-    {
-      path: '/wallet',
-      title: 'Wallet',
-      icon: 'bi bi-credit-card-2-front'
-    },
-    {
       path: '/account',
       title: 'Account',
       icon: 'bi bi-person',
