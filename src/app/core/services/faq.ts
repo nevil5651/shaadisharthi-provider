@@ -1,7 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { ApiService } from './api';
-import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 export interface Faq {
   id: number;

@@ -6,7 +6,7 @@ import { catchError } from 'rxjs/operators';
 import { BookingsResponse } from './models/booking.model';
  
 // Assume environment file exists
-import { environment } from '../../../environments/environment.development';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'

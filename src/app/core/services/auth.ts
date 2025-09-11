@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { catchError, finalize, map, switchMap, tap } from 'rxjs/operators';
 
-import { environment } from '../../../environments/environment.development';
+import { environment } from '../../../environments/environment';
 import { LoginApiResponse, User, UserProfile, UserStatus } from '../models/auth.model';
 import { ToastrService } from 'ngx-toastr';
 import { ApiService } from './api';

@@ -9,7 +9,7 @@ import {
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { AuthService } from './core/services/auth';
-import { environment } from '../environments/environment.development';
+import { environment } from '../environments/environment';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
