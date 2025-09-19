@@ -5,6 +5,7 @@ import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validatio
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { throwError } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 
 // Custom validator to check that two fields match
 export function passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
@@ -78,7 +79,7 @@ export class ResetPasswordComponent implements OnInit {
     const newPassword = this.password?.value;
     const body = { token: this.token, password: newPassword };
 
-    this.http.post('http://localhost:9998/ShaadiSharthi/ServiceProvider/reset-password', body)
+    this.http.post(`${environment.apiUrl}/ServiceProvider/reset-password`, body)
       .pipe(
         catchError(err => {
           this.error = err.error?.error || 'Failed to reset password. The link may have expired or is invalid.';

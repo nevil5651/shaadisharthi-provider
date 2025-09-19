@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { catchError, finalize } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { RouterModule } from '@angular/router';
 
 @Component({
@@ -46,11 +47,11 @@ export class ForgotPasswordComponent {
     const body = `email=${encodeURIComponent(email)}`;
     const headers = new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' });
 
-    this.http.post('http://localhost:9998/ShaadiSharthi/ServiceProvider/forgot-password', body, { headers })
+    this.http.post(`${environment.apiUrl}/ServiceProvider/forgot-password`, body, { headers })
       .pipe(
         catchError(error => {
           this.error = error.error?.error || 'Failed to send reset email. Please try again.';
-          return throwError(error);
+          return throwError(() => error);
         }),
         finalize(() => this.loading = false)
       )
