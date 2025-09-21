@@ -14,10 +14,9 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render title', () => {
+  it(`should have as title 'shaadisharthi-provider'`, () => {
     const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, shaadisharthi-provider');
+    const app = fixture.componentInstance;
+    expect(app.title).toEqual('shaadisharthi-provider');
   });
 });

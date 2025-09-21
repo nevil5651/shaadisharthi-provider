@@ -1,4 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { RouterTestingModule } from '@angular/router/testing';
+import { ToastrModule } from 'ngx-toastr';
 
 import { EmailVerificationComponent } from './email-verification';
 
@@ -8,7 +11,12 @@ describe('EmailVerification', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({ // Changed from EmailVerification to EmailVerificationComponent
-      imports: [EmailVerificationComponent]
+      imports: [
+        EmailVerificationComponent,
+        HttpClientTestingModule,
+        RouterTestingModule,
+        ToastrModule.forRoot(),
+      ],
     })
     .compileComponents(); // Changed from EmailVerification to EmailVerificationComponent
 
