@@ -1,59 +1,149 @@
-# ShaadisharthiProvider
+📦 Service Provider Portal (Angular + Java Backend)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.0.
+This repository contains the Service Provider Frontend of the ShaadiSharthi WebApp, built with Angular + Bootstrap.
+It allows service providers (e.g., photographers, caterers, decorators) to register, manage their business, upload services with media, and handle bookings — all connected to a Java Servlet backend.
 
-## Development server
+🚀 Key Features
 
-To start a local development server, run:
+🔐 Authentication & Onboarding
 
-```bash
-ng serve
-```
+Login / Signup flow with JWT-based authentication.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Forgot Password:
+Email-based reset link with one-time JWT token.
+Token verification before new password creation.
 
-## Code scaffolding
+Create Account:
+Email-based flow → set password, name, email.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Role-based redirection:
 
-```bash
-ng generate component component-name
-```
+Basic Registered → goes to Business Form.
+Pending Approval → redirected to Waiting Page.
+Approved → full access to Dashboard.
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+📝 Business Registration & Approval
 
-```bash
-ng generate --help
-```
+Service Provider must submit:
+Business name, GST, Aadhaar, PAN, location, phone(s).
 
-## Building
+Admin Approval System:
+Admin reviews business details.
+On accept, provider gets email: “Approved, you can log in.”
+On reject, provider gets email with rejection reason.
 
-To build the project run:
+📊 Dashboard
 
-```bash
-ng build
-```
+Personalized header with name + profile dropdown.
+Sidebar navigation:
+Services
+Pending Bookings
+Confirmed Bookings
+Account
+FAQs
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Dashboard widgets:
+Upcoming orders, total bookings, customer stats.
+Graphs & charts for booking analysis:
+Pending / Accepted / Rejected / Completed.
+Service performance & ratings.
+Financial overview.
 
-## Running unit tests
+🛠 Service Management
+Add/Edit/Delete Service:
+Name, category (e.g., Photography, Catering), description, price.
+Upload media files (images/videos).
+Cloudinary Integration:
+Request signature → direct upload to Cloudinary.
+Metadata stored in backend.
+Delete button removes media reference (Cloudinary cleanup planned in future).
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+Caching:
+First fetch → stored in cache.
+Re-visits → served from cache.
+Cache refreshes on updates/deletes.
 
-```bash
-ng test
-```
+📅 Booking Management
 
-## Running end-to-end tests
+Pending Bookings:
+List of customer bookings awaiting provider response.
+Accept or reject (optional reason).
+Confirmed Bookings:
+Accepted bookings with customer + service details.
+Mark as Complete (only after event date) or Cancel.
 
-For end-to-end (e2e) testing, run:
+Performance Scaling:
+Hybrid Infinite Scroll + Pagination:
+Fetches 20 bookings at a time.
 
-```bash
-ng e2e
-```
+Automatic scroll loading for seamless UX.
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Virtual Scrolling (Angular CDK):
+Only ~40 items rendered in DOM at once → smooth performance even with hundreds of bookings.
 
-## Additional Resources
+👤 Account & Support
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Profile Management:
+Overview: name, business details, address, contact info.
+Edit Profile: update personal & business details.
+Documents:
+Upload/view GST, Aadhaar, PAN (basic placeholder support).
+Change Password:
+Current + new password validation.
+
+FAQs:
+Admin-managed static Q&A list.
+Expand/collapse answers.
+Contact Support:
+Submit queries with subject + description.
+
+Queries sent directly to admin.
+
+🛡️ Security
+
+Current State:
+JWT stored in Session/Local Storage (vulnerable to XSS/CSRF).
+Role-based guards for Basic, Pending Approval, and Approved users.
+Auth headers added to backend calls.
+
+Planned Improvements:
+Move JWT handling to HTTP-only secure cookies.
+Implement stricter token expiry & refresh flow.
+Enhanced input sanitization for file uploads.
+
+⚡ Performance Optimizations
+
+Caching of service data to avoid redundant backend calls.
+Lazy Loading of services (backend call only when entering the Services page).
+Infinite Scroll + Pagination Hybrid for bookings.
+Virtual Scrolling (Angular CDK) ensures DOM never overloads.
+
+🛠️ Tech Stack
+
+Frontend: Angular, Bootstrap
+Backend: Java Servlets (Eclipse), MySQL
+Media Storage: Cloudinary
+Authentication: JWT (JSON Web Tokens)
+Charts: Angular chart libraries (for booking/financial analytics)
+
+📈 Future Roadmap
+
+🔒 Security Hardening
+
+Replace local/session storage with HTTP-only cookies.
+Role-based access with stricter token refresh flow.
+
+☁️ Cloudinary Cleanup Automation
+Lambda or scheduled service to remove unused media.
+
+🌍 Multi-language Support
+Expand UI beyond English.
+
+📸 Robust Media Uploading
+File size limits, better error handling, MIME validation.
+
+🔔 Real-time Notifications
+WebSockets/SignalR for instant booking updates.
+
+📊 Advanced Analytics
+Trends, financial forecasting, customer retention insights.
