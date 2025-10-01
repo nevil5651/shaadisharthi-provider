@@ -4,6 +4,7 @@
       <li class="nav-item">
         <a class="nav-link" 
            [routerLink]="item.path" 
+           (click)="onSidebarItemClick()"
            routerLinkActive="active"
            #rla="routerLinkActive"
            [class.collapsed]="!rla.isActive">

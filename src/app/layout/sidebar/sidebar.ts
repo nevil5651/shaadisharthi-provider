@@ -51,5 +51,11 @@ export class SidebarComponent {
     }
   ];
 
-  
+  onSidebarItemClick(): void {
+    // Close sidebar on item click on mobile view
+    // We check if the screen is small and if the sidebar is open.
+    if (window.innerWidth < 1200 && document.body.classList.contains('toggle-sidebar')) {
+      document.body.classList.remove('toggle-sidebar');
+    }
+  }
 }
