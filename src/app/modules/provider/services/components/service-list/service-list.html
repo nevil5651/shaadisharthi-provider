@@ -1,13 +1,15 @@
 <main id="main" class="main">
         <div class="pagetitle">
-            <h1>Services</h1>
-            <nav class="d-flex justify-content-between">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1>Services</h1>
+                <a [routerLink]="['./add']"><button type="button" class="btn btn-primary">Add Service</button></a>
+            </div>
+            <nav>
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                    <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
                     <li class="breadcrumb-item active">Services</li>
                 </ol>
-                <a [routerLink]="['./add']"><button type="button" class="btn btn-primary">Add Service</button></a>
-            </nav>
+            </nav>            
         </div>
 
         <section class="section dashboard">
@@ -40,10 +42,10 @@
                                         <td>{{ service.name }}</td>
                                         <td>{{ service.category }}</td>
                                         <td>
-                                            <a [routerLink]="['./view', service.id]" class="btn btn-primary btn-sm rounded-0 me-2" title="Details">
+                                            <a [routerLink]="['./view', service.id]" class="btn btn-primary btn-sm me-2" title="Details" style="min-width: 80px;">
                                                View <i class="ri-eye-fill"></i>
                                             </a>
-                                            <button (click)="editService(service.id)" class="btn btn-success btn-sm rounded-0" title="Edit">
+                                            <button (click)="editService(service.id)" class="btn btn-success btn-sm" title="Edit" style="min-width: 80px;">
                                                 Edit <i class="bx bxs-edit"></i>
                                             </button>
                                         </td>

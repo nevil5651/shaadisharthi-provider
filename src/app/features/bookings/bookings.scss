@@ -12,15 +12,7 @@
   }
 }
 
-.breadcrumb {
-  background: transparent;
-  padding: 0;
-  margin-bottom: 0;
-  
-  .breadcrumb-item + .breadcrumb-item::before {
-    content: ">";
-  }
-}
+
 
 /* Card Styling */
 .card {

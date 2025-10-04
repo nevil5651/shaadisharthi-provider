@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule } from '@angular/material/sort';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { ToastrService } from 'ngx-toastr';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
@@ -26,7 +26,6 @@ import { ConfirmationDialogComponent } from '../../shared/confirmation-dialog/co
     MatSortModule,
     MatButtonModule,
     MatProgressSpinnerModule,
-    MatSnackBarModule,
     MatDialogModule,
   ],
   templateUrl: './bookings.html',
@@ -48,8 +47,8 @@ export class BookingsComponent implements OnInit, OnDestroy {
     private bookingService: BookingService,
     // private authService: AuthService, // Uncomment when AuthService is ready
     public dialog: MatDialog,
-    private snackBar: MatSnackBar,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -76,7 +75,7 @@ export class BookingsComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           this.loading = false;
-          this.snackBar.open('Error loading bookings', 'OK', { duration: 3000 });
+          this.toastr.error('Error loading bookings', 'Error');
           console.error('API error: ', err);
           this.cdr.markForCheck(); // Also update view on error (e.g., to hide spinner)
         }
@@ -108,10 +107,10 @@ export class BookingsComponent implements OnInit, OnDestroy {
           .subscribe({
             next: () => {
               this.bookings = this.bookings.filter(b => b.bookingId !== bookingId);
-              this.snackBar.open('Booking accepted successfully', 'OK', { duration: 3000 });
+              this.toastr.success('Booking accepted successfully', 'Success');
               this.cdr.markForCheck(); // Update the view after removing an item
             },
-            error: () => this.snackBar.open('Error accepting booking', 'OK', { duration: 3000 })
+            error: () => this.toastr.error('Error accepting booking', 'Error')
           });
       }
     });
@@ -132,10 +131,10 @@ export class BookingsComponent implements OnInit, OnDestroy {
           .subscribe({
             next: () => {
               this.bookings = this.bookings.filter(b => b.bookingId !== bookingId);
-              this.snackBar.open('Booking rejected successfully', 'OK', { duration: 3000 });
+              this.toastr.success('Booking rejected successfully', 'Success');
               this.cdr.markForCheck(); // Update the view after removing an item
             },
-            error: () => this.snackBar.open('Error rejecting booking', 'OK', { duration: 3000 })
+            error: () => this.toastr.error('Error rejecting booking', 'Error')
           });
       }
     });
