@@ -1,5 +1,4 @@
-// Component for adding a new service, handling form and media uploads.
-
+// add-service.ts
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -9,7 +8,10 @@ import { finalize } from 'rxjs';
 import { ServiceStateService } from '../../services/service-state.service';
 import { CloudinaryUploadService, CloudinaryUploadResponse } from '../../services/cloudinary';
 
-// Defining the component as standalone with its imports.
+// -----------------------------------------------------------------------------
+// COMPONENT: AddServiceComponent
+// Handles creation of a new service + media upload (image/video) to Cloudinary.
+// -----------------------------------------------------------------------------
 @Component({
   selector: 'app-add-service',
   standalone: true,
@@ -18,39 +20,90 @@ import { CloudinaryUploadService, CloudinaryUploadResponse } from '../../service
   styleUrls: ['./add-service.scss']
 })
 export class AddServiceComponent implements OnInit {
-  // Injecting dependencies: FormBuilder, Router, State Service, Toastr, Cloudinary.
+  // -------------------------------------------------------------------------
+  // Injected dependencies
+  // -------------------------------------------------------------------------
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly serviceState = inject(ServiceStateService);
   private readonly toastr = inject(ToastrService);
   private readonly cloudinaryService = inject(CloudinaryUploadService);
 
-  // Form group for the service data.
+  // -------------------------------------------------------------------------
+  // Form & UI state
+  // -------------------------------------------------------------------------
   public serviceForm!: FormGroup;
-
-  // Flags for submission and upload states.
   public isSubmitting = false;
   public isUploading = false;
 
+  // -------------------------------------------------------------------------
+  // Size limits (customise here)
+  // -------------------------------------------------------------------------
+  private readonly MAX_IMAGE_SIZE_MB = 3;   // 5 MB max for images
+  private readonly MAX_VIDEO_SIZE_MB = 19;  // 50 MB max for videos (adjust as needed)
+
   constructor() {}
 
-  // Lifecycle hook to initialize the form.
+  // -------------------------------------------------------------------------
+  // Initialise the reactive form
+  // -------------------------------------------------------------------------
   ngOnInit(): void {
     this.serviceForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
       category: ['', Validators.required],
       description: ['', [Validators.required, Validators.maxLength(500)]],
       price: [null, [Validators.required, Validators.min(0)]],
-      media: this.fb.array([]) // FormArray to hold media objects
+      media: this.fb.array([]) // Holds uploaded media objects
     });
   }
 
-  // Getter for the media FormArray.
+  // -------------------------------------------------------------------------
+  // Helper: convert bytes → MB (rounded to 2 decimals)
+  // -------------------------------------------------------------------------
+  private toMB(bytes: number): number {
+    return Number((bytes / (1024 * 1024)).toFixed(2));
+  }
+
+  // -------------------------------------------------------------------------
+  // Validate file type & size **before** uploading
+  // Returns true if the file is acceptable, false otherwise.
+  // -------------------------------------------------------------------------
+  private validateFile(file: File): boolean {
+    const type = file.type;
+
+    // ---- TYPE CHECK -------------------------------------------------------
+    const isImage = type.startsWith('image/');
+    const isVideo = type.startsWith('video/');
+
+    if (!isImage && !isVideo) {
+      this.toastr.error('Only image and video files are allowed.');
+      return false;
+    }
+
+    // ---- SIZE CHECK -------------------------------------------------------
+    const sizeMB = this.toMB(file.size);
+    if (isImage && sizeMB > this.MAX_IMAGE_SIZE_MB) {
+      this.toastr.error(`Image size cannot exceed ${this.MAX_IMAGE_SIZE_MB} MB.`);
+      return false;
+    }
+    if (isVideo && sizeMB > this.MAX_VIDEO_SIZE_MB) {
+      this.toastr.error(`Video size cannot exceed ${this.MAX_VIDEO_SIZE_MB} MB.`);
+      return false;
+    }
+
+    return true;
+  }
+
+  // -------------------------------------------------------------------------
+  // Getter for the media FormArray
+  // -------------------------------------------------------------------------
   get media(): FormArray {
     return this.serviceForm.get('media') as FormArray;
   }
 
-  // Handles file selection for media upload.
+  // -------------------------------------------------------------------------
+  // File input change → validate → upload to Cloudinary
+  // -------------------------------------------------------------------------
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) {
@@ -59,23 +112,19 @@ export class AddServiceComponent implements OnInit {
 
     const file = input.files[0];
 
-    // Basic validation for file type and size
-    if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
-        this.toastr.error('Only image and video files are allowed.');
-        return;
+    // ---- VALIDATE BEFORE ANY NETWORK CALL -------------------------------
+    if (!this.validateFile(file)) {
+      // Reset input so the same invalid file can be re-selected later
+      input.value = '';
+      return;
     }
 
-    if (file.size > 10 * 1024 * 1024) { // 10MB limit
-        this.toastr.error('File size cannot exceed 10MB.');
-        return;
-    }
-
-    // Set uploading flag and upload via Cloudinary service.
+    // ---- PROCEED WITH UPLOAD --------------------------------------------
     this.isUploading = true;
     this.cloudinaryService.upload(file)
       .pipe(finalize(() => {
         this.isUploading = false;
-        input.value = ''; // Reset file input to allow selecting the same file again
+        input.value = ''; // allow same file again after upload
       }))
       .subscribe({
         next: (response: CloudinaryUploadResponse) => {
@@ -89,12 +138,13 @@ export class AddServiceComponent implements OnInit {
       });
   }
 
-  // Adds a new media control to the FormArray after upload.
+  // -------------------------------------------------------------------------
+  // Push a new media object into the FormArray after successful upload
+  // -------------------------------------------------------------------------
   private addMediaControl(response: CloudinaryUploadResponse, file: File): void {
     const resourceType = file.type.startsWith('video') ? 'video' : 'image';
     const fileExtension = file.name.split('.').pop() || '';
-    // Storing file size in MB, consistent with your previous Java implementation.
-    const fileSizeInMB = parseFloat((file.size / (1024 * 1024)).toFixed(2));
+    const fileSizeInMB = this.toMB(file.size); // consistent with previous Java impl
 
     const mediaGroup = this.fb.group({
       url: [response.secure_url, Validators.required],
@@ -102,17 +152,20 @@ export class AddServiceComponent implements OnInit {
       fileSize: [fileSizeInMB],
       fileExtension: [fileExtension]
     });
-
     this.media.push(mediaGroup);
   }
 
-  // Removes a media item from the FormArray.
+  // -------------------------------------------------------------------------
+  // Remove media from the form (does NOT delete from Cloudinary)
+  // -------------------------------------------------------------------------
   removeMedia(index: number): void {
     this.media.removeAt(index);
     this.toastr.info('Media removed from the form.');
   }
 
-  // Handles form submission.
+  // -------------------------------------------------------------------------
+  // Submit the whole service (text fields + media URLs)
+  // -------------------------------------------------------------------------
   onSubmit(): void {
     this.serviceForm.markAllAsTouched();
     if (this.serviceForm.invalid) {
@@ -120,7 +173,6 @@ export class AddServiceComponent implements OnInit {
       return;
     }
 
-    // Set submitting flag and add service via state service.
     this.isSubmitting = true;
     this.serviceState.addService(this.serviceForm.value).pipe(
       finalize(() => this.isSubmitting = false)
@@ -128,7 +180,7 @@ export class AddServiceComponent implements OnInit {
       next: () => {
         this.router.navigate(['/services']);
       },
-      // Error is already handled by the state service, just need to log it here if desired.
+      // Errors are already handled inside ServiceStateService
       error: (err) => console.error('Failed to create service', err)
     });
   }

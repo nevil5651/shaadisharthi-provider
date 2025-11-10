@@ -1,5 +1,4 @@
 // Component for editing an existing service, handling form patching, media updates, and deletion.
-
 import { Component, OnDestroy, OnInit, inject, DestroyRef } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute, } from '@angular/router';
@@ -42,9 +41,52 @@ export class EditService implements OnInit, OnDestroy {
   isUploading = false;
   private isFormInitialized = false;
 
+  // -------------------------------------------------------------------------
+  // Size limits – customize as needed
+  // -------------------------------------------------------------------------
+  private readonly MAX_IMAGE_SIZE_MB = 3;   // 5 MB max for images
+  private readonly MAX_VIDEO_SIZE_MB = 19;  // 50 MB max for videos
+
   constructor() {
     this.service$ = this.serviceState.selectedService$;
     this.isLoading$ = this.serviceState.isLoading$;
+  }
+
+  // -------------------------------------------------------------------------
+  // Helper: convert bytes → MB (rounded to 2 decimals)
+  // -------------------------------------------------------------------------
+  private toMB(bytes: number): number {
+    return Number((bytes / (1024 * 1024)).toFixed(2));
+  }
+
+  // -------------------------------------------------------------------------
+  // Validate file type & size **before** upload
+  // Returns true if valid, false otherwise.
+  // -------------------------------------------------------------------------
+  private validateFile(file: File): boolean {
+    const type = file.type;
+
+    // ---- TYPE CHECK -------------------------------------------------------
+    const isImage = type.startsWith('image/');
+    const isVideo = type.startsWith('video/');
+
+    if (!isImage && !isVideo) {
+      this.toastr.error('Only image and video files are allowed.');
+      return false;
+    }
+
+    // ---- SIZE CHECK -------------------------------------------------------
+    const sizeMB = this.toMB(file.size);
+    if (isImage && sizeMB > this.MAX_IMAGE_SIZE_MB) {
+      this.toastr.error(`Image size cannot exceed ${this.MAX_IMAGE_SIZE_MB} MB.`);
+      return false;
+    }
+    if (isVideo && sizeMB > this.MAX_VIDEO_SIZE_MB) {
+      this.toastr.error(`Video size cannot exceed ${this.MAX_VIDEO_SIZE_MB} MB.`);
+      return false;
+    }
+
+    return true;
   }
 
   // Lifecycle hook to initialize form and subscribe to route/service changes.
@@ -109,7 +151,6 @@ export class EditService implements OnInit, OnDestroy {
     return this.serviceForm.get('media') as FormArray;
   }
 
-  // Handles file selection for adding new media.
   // Creates a FormGroup for an existing media item.
   private addMediaControl(mediaItem: Media): void {
     const mediaGroup = this.fb.group({
@@ -128,24 +169,21 @@ export class EditService implements OnInit, OnDestroy {
       const serviceMediaIds = mediaItems.map(m => m.id).sort();
       if (JSON.stringify(formMediaIds) === JSON.stringify(serviceMediaIds)) return;
     }
-
     this.media.clear({ emitEvent: false });
     mediaItems.forEach(m => this.addMediaControl(m));
   }
-  
+
+  // Handles file selection for adding new media.
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return;
 
     const file = input.files[0];
-    if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
-        this.toastr.error('Only image and video files are allowed.');
-        return;
-    }
 
-    if (file.size > 10 * 1024 * 1024) { // 10MB limit
-        this.toastr.error('File size cannot exceed 10MB.');
-        return;
+    // ---- VALIDATE BEFORE UPLOAD -----------------------------------------
+    if (!this.validateFile(file)) {
+      input.value = ''; // Reset to allow re-selection
+      return;
     }
 
     this.isUploading = true;
@@ -167,7 +205,6 @@ export class EditService implements OnInit, OnDestroy {
     if (!confirm('Are you sure you want to delete this media? This action is immediate and cannot be undone.')) {
       return;
     }
-
     // The state service handles the API call and state update.
     // The form will be updated automatically via the `selectedService$` subscription.
     this.serviceState.deleteMediaFromService(this.serviceId, mediaId).subscribe({
@@ -181,12 +218,10 @@ export class EditService implements OnInit, OnDestroy {
       this.toastr.error('Service ID is missing. Cannot delete.');
       return;
     }
-
     // For a better UX, you could replace this with a custom confirmation modal.
     const isConfirmed = window.confirm(
       'Are you sure you want to delete this service? This action cannot be undone.'
     );
-
     if (isConfirmed) {
       this.serviceState
         .deleteService(this.serviceId)
@@ -205,14 +240,12 @@ export class EditService implements OnInit, OnDestroy {
       this.toastr.error('Please correct the errors in the form before submitting.');
       return;
     }
-
-    //To check if User made some changes 
+    // To check if User made some changes
     if (!this.serviceForm.dirty) {
       this.toastr.info('No changes were made to the service fields.');
       this.router.navigate(['/services']);
       return;
     }
-
     this.isSubmitting = true;
     // We only need to submit the non-media fields, as media is handled separately and immediately.
     const { media, ...serviceData } = this.serviceForm.value;
