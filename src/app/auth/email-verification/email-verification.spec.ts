@@ -9,22 +9,23 @@ describe('EmailVerification', () => {
   let component: EmailVerificationComponent;
   let fixture: ComponentFixture<EmailVerificationComponent>;
 
+  // Setup test bed with mocks
   beforeEach(async () => {
-    await TestBed.configureTestingModule({ // Changed from EmailVerification to EmailVerificationComponent
+    await TestBed.configureTestingModule({
       imports: [
         EmailVerificationComponent,
-        HttpClientTestingModule,
-        RouterTestingModule,
-        ToastrModule.forRoot(),
+        HttpClientTestingModule,   // Mock HTTP (for AuthService)
+        RouterTestingModule,       // Mock navigation
+        ToastrModule.forRoot(),    // Mock toasts
       ],
-    })
-    .compileComponents(); // Changed from EmailVerification to EmailVerificationComponent
+    }).compileComponents();
 
     fixture = TestBed.createComponent(EmailVerificationComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
+  // Basic test: component loads
   it('should create', () => {
     expect(component).toBeTruthy();
   });

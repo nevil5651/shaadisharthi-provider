@@ -3,48 +3,49 @@ import { DOCUMENT } from '@angular/common';
 import { AuthService } from '../../core/services/auth';
 import { Subscription } from 'rxjs';
 
+// Main header component — appears on all pages
 @Component({
   selector: 'app-header',
-  imports: [],
-  standalone: true,
-  templateUrl: './header.html',
-  styleUrl: './header.scss',
+  imports: [],                    // No child components imported here
+  standalone: true,               // Standalone component (Angular 14+)
+  templateUrl: './header.html',   // HTML template
+  styleUrl: './header.scss',      // SCSS styles
 })
 export class Header implements OnInit, OnDestroy {
-  public accountData: any | null = null;
-  private accountDataSubscription: Subscription | undefined;
+  public accountData: any | null = null;  // Holds current user info (name, etc.)
+  private accountDataSubscription: Subscription | undefined;  // Tracks subscription
 
+  // Inject DOM document, auth service, and change detector
   constructor(
     @Inject(DOCUMENT) private document: Document,
     private authService: AuthService,
     private cdr: ChangeDetectorRef
   ) {}
 
+  // Runs when component loads
   ngOnInit(): void {
-    //  AuthService exposes a `currentUser$` observable. We subscribe to it here.
-    // This ensures that whenever the user data is updated (e.g., on the account page),
-    // the name in the header will update automatically.
-    this.accountDataSubscription = this.authService.currentUser$.subscribe((
-      data: any) => {
-        this.accountData = data;
-        this.cdr.markForCheck();
-      }
-    );
+    // Subscribe to current user data from AuthService
+    // Whenever user logs in or updates profile, this updates automatically
+    this.accountDataSubscription = this.authService.currentUser$.subscribe((data: any) => {
+      this.accountData = data;        // Update local copy
+      this.cdr.markForCheck();        // Force Angular to refresh view
+    });
   }
 
+  // Toggles the sidebar (adds/removes 'toggle-sidebar' class on body)
   toggleSidebar(): void {
     this.document.body.classList.toggle('toggle-sidebar');
   }
 
+  // Logs out the user by calling AuthService
   logout(): void {
     this.authService.logoutFromServer();
   }
 
+  // Cleanup: unsubscribe when component is destroyed
   ngOnDestroy(): void {
-    // It's a good practice to unsubscribe to prevent memory leaks.
     if (this.accountDataSubscription) {
-      this.accountDataSubscription.unsubscribe();
+      this.accountDataSubscription.unsubscribe();  // Prevent memory leaks
     }
   }
-
 }

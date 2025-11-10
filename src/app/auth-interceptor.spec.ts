@@ -11,6 +11,7 @@ describe('authInterceptor', () => {
     TestBed.configureTestingModule({});
   });
 
+  // Basic test: interceptor function exists
   it('should be created', () => {
     expect(interceptor).toBeTruthy();
   });

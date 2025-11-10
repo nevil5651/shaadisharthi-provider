@@ -7,37 +7,35 @@ import { throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { RouterModule } from '@angular/router';
 
+// Handles "Forgot Password" — sends reset link to user's email
 @Component({
   selector: 'app-forgot-password',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    RouterModule
-  ],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './forgot-password.html',
   styleUrls: ['./forgot-password.scss']
 })
 export class ForgotPasswordComponent {
   forgotPasswordForm: FormGroup;
-  loading = false;
+  loading = false;           // For button spinner
   message: string | null = null;
   error: string | null = null;
 
   constructor(private fb: FormBuilder, private http: HttpClient) {
+    // Simple form with email validation
     this.forgotPasswordForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]]
     });
   }
 
+  // Getter for template
   get email() {
     return this.forgotPasswordForm.get('email');
   }
 
+  // Submit: send email to backend
   onSubmit() {
-    if (this.forgotPasswordForm.invalid) {
-      return;
-    }
+    if (this.forgotPasswordForm.invalid) return;
 
     this.loading = true;
     this.message = null;
@@ -57,7 +55,7 @@ export class ForgotPasswordComponent {
       )
       .subscribe(() => {
         this.message = 'If your email is registered, a reset link has been sent.';
-        this.forgotPasswordForm.reset();
+        this.forgotPasswordForm.reset();  // Clear form
       });
   }
 }

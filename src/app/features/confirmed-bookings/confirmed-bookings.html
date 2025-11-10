@@ -1,4 +1,4 @@
-<!-- confirmed-bookings.html -->
+<!-- Main layout for confirmed bookings page -->
 <main id="main" class="main">
   <div class="pagetitle">
     <h1>Confirmed Bookings</h1>
@@ -17,12 +17,12 @@
           <div class="card-body">
             <h5 class="card-title">Confirmed Bookings List</h5>
 
-            <!-- Loading Spinner -->
+            <!-- Initial loading spinner -->
             <div *ngIf="loading && !bookings.length" class="text-center py-4">
               <mat-spinner diameter="40"></mat-spinner>
             </div>
 
-            <!-- Virtual Scroll Table -->
+            <!-- Virtual scroll viewport for large lists -->
             <cdk-virtual-scroll-viewport 
               itemSize="50" 
               class="viewport styled-viewport"
@@ -40,7 +40,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <!-- Use regular ngFor instead of virtual scroll for debugging -->
+                  <!-- Note: Using *ngFor here instead of *cdkVirtualFor (comment says for debugging) -->
                   <tr *ngFor="let booking of bookings; trackBy: trackByBookingId">
                     <td>#{{booking.bookingId}}</td>
                     <td>{{booking.customerName}}</td>
@@ -49,9 +49,11 @@
                     <td>{{booking.totalAmount | currency}}</td>
                     <td>
                       <div class="btn-group">
+                        <!-- Mark as done -->
                         <button class="btn btn-success btn-sm" (click)="completeBooking(booking.bookingId)">
                           <i class="bi bi-check-circle"></i> Complete
                         </button>
+                        <!-- Cancel with reason -->
                         <button class="btn btn-danger btn-sm" (click)="cancelBooking(booking.bookingId)">
                           <i class="bi bi-x-circle"></i> Cancel
                         </button>
@@ -62,13 +64,13 @@
               </table>
             </cdk-virtual-scroll-viewport>
 
-            <!-- Show loading when appending data -->
+            <!-- Show small spinner when loading more items -->
             <div *ngIf="loading && bookings.length" class="text-center py-2">
               <mat-spinner diameter="30"></mat-spinner>
               <p class="text-muted mt-2">Loading more bookings...</p>
             </div>
 
-            <!-- Empty State -->
+            <!-- Empty state when no confirmed bookings -->
             <div *ngIf="!loading && !bookings.length" class="text-center py-4 text-muted">
               No confirmed bookings found.
             </div>

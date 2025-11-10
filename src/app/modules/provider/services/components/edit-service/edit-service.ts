@@ -1,3 +1,5 @@
+// Component for editing an existing service, handling form patching, media updates, and deletion.
+
 import { Component, OnDestroy, OnInit, inject, DestroyRef } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute, } from '@angular/router';
@@ -7,8 +9,9 @@ import { ToastrService } from 'ngx-toastr';
 import { finalize, tap, filter, switchMap } from 'rxjs/operators';
 import { Service, Media } from '../../models/service.model';
 import { Observable, Subscription } from 'rxjs';
-
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
+// Defining the component as standalone with imports.
 @Component({
   selector: 'app-edit-service',
   standalone: true,
@@ -17,6 +20,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   styleUrls: ['./edit-service.scss']
 })
 export class EditService implements OnInit, OnDestroy {
+  // Injecting dependencies.
   private readonly fb = inject(FormBuilder);
   private readonly serviceState = inject(ServiceStateService);
   private readonly router = inject(Router);
@@ -24,13 +28,16 @@ export class EditService implements OnInit, OnDestroy {
   private readonly toastr = inject(ToastrService);
   private readonly destroyRef = inject(DestroyRef);
 
+  // Form group and service ID.
   serviceForm!: FormGroup;
   serviceId!: number;
 
+  // Observables for service data and loading state.
   public readonly service$: Observable<Service | null>;
   public readonly isLoading$: Observable<boolean>;
   private serviceSubscription!: Subscription;
 
+  // Flags for states.
   isSubmitting = false;
   isUploading = false;
   private isFormInitialized = false;
@@ -40,6 +47,7 @@ export class EditService implements OnInit, OnDestroy {
     this.isLoading$ = this.serviceState.isLoading$;
   }
 
+  // Lifecycle hook to initialize form and subscribe to route/service changes.
   ngOnInit(): void {
     this.initializeForm();
 
@@ -63,6 +71,7 @@ export class EditService implements OnInit, OnDestroy {
     });
   }
 
+  // Lifecycle hook to clean up subscription.
   ngOnDestroy(): void {
     // Clean up the subscription to prevent memory leaks.
     if (this.serviceSubscription) {
@@ -70,17 +79,18 @@ export class EditService implements OnInit, OnDestroy {
     }
   }
 
+  // Initializes the empty form.
   private initializeForm(): void {
     this.serviceForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
       category: ['', Validators.required],
       description: ['', [Validators.required, Validators.maxLength(500)]],
       price: [null, [Validators.required, Validators.min(0)]],
-      media: this.fb.array([])
+      media: this.fb.array([]) // FormArray for media.
     });
   }
 
-  // Populates the form with data from the service object.
+  // Patches the form with service data.
   private patchForm(service: Service): void {
     this.serviceForm.patchValue({
       name: service.name,
@@ -94,10 +104,12 @@ export class EditService implements OnInit, OnDestroy {
     service.media?.forEach(m => this.addMediaControl(m));
   }
 
+  // Getter for media FormArray.
   get media(): FormArray {
     return this.serviceForm.get('media') as FormArray;
   }
 
+  // Handles file selection for adding new media.
   // Creates a FormGroup for an existing media item.
   private addMediaControl(mediaItem: Media): void {
     const mediaGroup = this.fb.group({
@@ -120,7 +132,7 @@ export class EditService implements OnInit, OnDestroy {
     this.media.clear({ emitEvent: false });
     mediaItems.forEach(m => this.addMediaControl(m));
   }
-
+  
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return;
@@ -130,6 +142,7 @@ export class EditService implements OnInit, OnDestroy {
         this.toastr.error('Only image and video files are allowed.');
         return;
     }
+
     if (file.size > 10 * 1024 * 1024) { // 10MB limit
         this.toastr.error('File size cannot exceed 10MB.');
         return;
@@ -149,6 +162,7 @@ export class EditService implements OnInit, OnDestroy {
     });
   }
 
+  // Handles media removal with confirmation.
   removeMedia(mediaId: number): void {
     if (!confirm('Are you sure you want to delete this media? This action is immediate and cannot be undone.')) {
       return;
@@ -161,6 +175,7 @@ export class EditService implements OnInit, OnDestroy {
     });
   }
 
+  // Handles service deletion with confirmation.
   deleteService(): void {
     if (!this.serviceId) {
       this.toastr.error('Service ID is missing. Cannot delete.');
@@ -183,6 +198,7 @@ export class EditService implements OnInit, OnDestroy {
     }
   }
 
+  // Handles form submission for updates.
   onSubmit(): void {
     this.serviceForm.markAllAsTouched();
     if (this.serviceForm.invalid) {
@@ -190,18 +206,16 @@ export class EditService implements OnInit, OnDestroy {
       return;
     }
 
-  //To check if User made some changes 
+    //To check if User made some changes 
     if (!this.serviceForm.dirty) {
-  this.toastr.info('No changes were made to the service fields.');
-  this.router.navigate(['/services']);
-  return;
-  }
+      this.toastr.info('No changes were made to the service fields.');
+      this.router.navigate(['/services']);
+      return;
+    }
 
     this.isSubmitting = true;
-
     // We only need to submit the non-media fields, as media is handled separately and immediately.
     const { media, ...serviceData } = this.serviceForm.value;
-
     this.serviceState.updateService(this.serviceId, serviceData).pipe(
       finalize(() => this.isSubmitting = false)
     ).subscribe({

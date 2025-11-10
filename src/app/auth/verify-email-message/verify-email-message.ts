@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth';
 import { ToastrService } from 'ngx-toastr';
 
+// Shown after verification email is sent
 @Component({
   selector: 'app-verify-email-message',
   standalone: true,
@@ -11,18 +12,29 @@ import { ToastrService } from 'ngx-toastr';
   templateUrl: './verify-email-message.html',
 })
 export class VerifyEmailMessageComponent implements OnInit {
-  email: string = '';
-  isResending = false;
+  email: string = '';         // Email to display
+  isResending = false;        // Resend loading state
 
-  constructor(private route: ActivatedRoute, private authService: AuthService, private router: Router,private toastr: ToastrService) {}
+  constructor(
+    private route: ActivatedRoute,
+    private authService: AuthService,
+    private router: Router,
+    private toastr: ToastrService
+  ) {}
 
   ngOnInit() {
-    this.email = this.route.snapshot.queryParamMap.get('email') || localStorage.getItem('pendingEmail') || 'your email';
-    if (!this.email) {
+    // Get email from URL query param, fallback to localStorage
+    this.email = this.route.snapshot.queryParamMap.get('email') 
+                 || localStorage.getItem('pendingEmail') 
+                 || 'your email';
+
+    // If no email found, send back to start
+    if (!this.email || this.email === 'your email') {
       this.router.navigate(['/email-verification']);
     }
   }
 
+  // Resend verification email
   resendEmail() {
     if (this.email) {
       this.isResending = true;
@@ -30,7 +42,6 @@ export class VerifyEmailMessageComponent implements OnInit {
         next: () => {
           this.isResending = false;
           this.toastr.success('Verification email sent successfully!', 'Success');
-          // Optionally show a success toast
         },
         error: () => {
           this.isResending = false;

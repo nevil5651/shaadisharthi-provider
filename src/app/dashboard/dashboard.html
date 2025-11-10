@@ -1,17 +1,23 @@
+<!-- 
+  Main content area for the Dashboard page.
+  Includes page title, breadcrumb navigation, and various cards/charts for metrics.
+-->
 <main id="main" class="main">
+  <!-- Page header with title and breadcrumb -->
   <div class="pagetitle">
     <h1>Dashboard</h1>
     <nav>
       <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="index.jsp">Home</a></li>
-        <li class="breadcrumb-item active">Dashboard</li>
+        <li class="breadcrumb-item"><a href="index.jsp">Home</a></li>  <!-- Link to home (note: .jsp might be a typo or legacy) -->
+        <li class="breadcrumb-item active">Dashboard</li>             <!-- Current page -->
       </ol>
     </nav>
   </div>
   <!-- End Page Title -->
 
+  <!-- Dashboard section with cards and charts -->
   <section class="section dashboard">
-    <!-- Filter Controls -->
+    <!-- Filter Controls (currently commented out, but ready for month/year filtering) -->
     <!-- <div class="row mb-3">
       <div class="col-md-6">
         <div class="btn-group" role="group">
@@ -21,7 +27,7 @@
             This Month
           </button>
           <button type="button" class="btn btn-outline-primary" 
-                  [class.active]="selectedMonthFilter === 'lastMonth'" 
+                  [class.active]="selectedMonthFilter === 'thisMonth'" 
                   (click)="selectedMonthFilter = 'lastMonth'; onFilterChange()">
             Last Month
           </button>
@@ -43,19 +49,22 @@
       </div>
     </div> -->
 
+    <!-- Row for metric cards and charts -->
     <div class="row">
-      <!-- Order Card -->
-      <div class="col-12 col-md-6 col-lg-4">
+      <!-- Upcoming Orders Card -->
+      <div class="col-12 col-md-6 col-lg-4">  <!-- Responsive column -->
         <div class="card info-card sales-card">
           <div class="card-body">
             <h5 class="card-title">Upcoming orders</h5>
             <div class="d-flex align-items-center">
+              <!-- Icon circle -->
               <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                <i class="bi bi-cart"></i>
+                <i class="bi bi-cart"></i>  <!-- Bootstrap cart icon -->
               </div>
+              <!-- Metric display -->
               <div class="ps-4">
-                <h6>{{upcomingOrders}}</h6>
-                <span class="text-success small pt-1 fw-bold">12%</span> 
+                <h6>{{upcomingOrders}}</h6>  <!-- Dynamic value from .ts -->
+                <span class="text-success small pt-1 fw-bold">12%</span>  <!-- Hardcoded increase (update dynamically if needed) -->
                 <span class="text-muted small pt-2 ps-1">increase</span>
               </div>
             </div>
@@ -64,9 +73,10 @@
       </div>
       <!-- End Order Card -->
 
-      <!-- Order This Card -->
+      <!-- Total Orders This Month Card -->
       <div class="col-12 col-md-6 col-lg-4">
         <div class="card info-card sales-card">
+          <!-- Filter dropdown (commented out) -->
           <!-- <div class="filter">
             <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
             <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
@@ -80,14 +90,14 @@
 
           <div class="card-body">
             <h5 class="card-title">
-              Total Orders <span>| This Month</span>
+              Total Orders <span>| This Month</span>  <!-- Title with time period -->
             </h5>
             <div class="d-flex align-items-center">
               <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                 <i class="bi bi-cart"></i>
               </div>
-              <div class="ps-3">
-                <h6>{{totalOrdersThisMonth}}</h6>
+              <div class="ps-3">  <!-- Slight padding adjustment -->
+                <h6>{{totalOrdersThisMonth}}</h6>  <!-- Dynamic value -->
                 <span class="text-success small pt-1 fw-bold">12%</span> 
                 <span class="text-muted small pt-2 ps-1">increase</span>
               </div>
@@ -95,6 +105,7 @@
           </div>
         </div>
       </div>
+
       <!-- End Order This year Card -->
 
       <!-- Revenue Card -->
@@ -205,12 +216,15 @@
       </div> -->
       <!-- End Total earnings Card -->
 
-      <!-- Booking Analysis Chart -->
+      <!-- Booking Analysis Chart -->    
+
       <div class="col-lg-6">
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">Booking Analysis</h5>
+            <!-- Container for ApexCharts -->
             <div id="booking-analysis-chart">
+              <!-- ApexCharts component with bound options -->
               <apx-chart 
                 [series]="bookingAnalysisChart.series" 
                 [chart]="bookingAnalysisChart.chart" 
@@ -224,7 +238,7 @@
       </div>
       <!-- End Booking Analysis Chart -->
 
-      <!-- Performance and Rating Chart -->
+      <!-- Performance and Rating Chart (Bar chart) -->
       <div class="col-lg-6">
         <div class="card">
           <div class="card-body">
@@ -245,7 +259,7 @@
       </div>
       <!-- End Performance and Rating Chart -->
 
-      <!-- Booking Calendar Chart -->
+      <!-- Booking Calendar Chart (Line chart) -->
       <div class="col-lg-6">
         <div class="card">
           <div class="card-body">
@@ -266,7 +280,7 @@
       </div>
       <!-- End Booking Calendar Chart -->
 
-      <!-- Financial Chart -->
+      <!-- Financial Overview Chart (Area chart) -->
       <div class="col-lg-6">
         <div class="card">
           <div class="card-body">

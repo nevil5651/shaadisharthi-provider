@@ -11,6 +11,7 @@ import { Faq, FaqQuery, FaqService } from '../../core/services/faq';
 import { Observable, EMPTY } from 'rxjs';
 import { finalize, take, tap } from 'rxjs/operators';
 
+// This is the main component for the FAQs page
 @Component({
   selector: 'app-faqs',
   standalone: true,
@@ -27,14 +28,19 @@ import { finalize, take, tap } from 'rxjs/operators';
   styleUrls: ['./faqs.scss'],
 })
 export class FaqsComponent implements OnInit {
+  // Injecting dependencies using Angular's inject function
   private fb = inject(FormBuilder);
   private faqService = inject(FaqService);
   private toastr = inject(ToastrService);
 
+  // Observable to hold the list of FAQs, starts empty
   faqs$: Observable<Faq[]> = EMPTY;
+  // Flag to show if the form is being submitted
   isSubmitting = false;
+  // Flag to track if the modal is open
   isModalOpen = false;
 
+  // Setting up the reactive form for the query submission
   // Initialize the form directly for better type inference and to avoid definite assignment assertions.
   queryForm: FormGroup = this.fb.group({
     subject: ['', [Validators.required, Validators.minLength(5)]],
@@ -51,6 +57,7 @@ export class FaqsComponent implements OnInit {
     return this.queryForm.get('message');
   }
 
+  // Lifecycle hook that runs when the component initializes
   ngOnInit(): void {
     // This line is required for the FAQ list in your HTML to display questions.
     
@@ -64,10 +71,12 @@ export class FaqsComponent implements OnInit {
     // Mark all fields as touched to trigger validation messages in the template.
     this.queryForm.markAllAsTouched();
 
+    // If the form is invalid, stop here
     if (this.queryForm.invalid) {
       return;
     }
 
+    // Set submitting flag to true
     this.isSubmitting = true;
 
     // Trim values before sending to the API for better data integrity.
@@ -76,10 +85,12 @@ export class FaqsComponent implements OnInit {
       message: this.queryForm.value.message.trim(),
     };
 
+    // Call the service to add the query
     this.faqService.addQuery(formValue)
       .pipe(
         take(1), // Ensure the subscription automatically completes after one emission.
         tap(() => {
+          // Show success message and close modal on success
           this.toastr.success('Your query has been submitted successfully!');
           this.closeModal();
         }),
@@ -87,12 +98,14 @@ export class FaqsComponent implements OnInit {
       )
       .subscribe({
         error: (err) => {
+          // Handle error by showing toast and logging
           this.toastr.error('Failed to submit your query. Please try again.', 'API Error');
           console.error('Error submitting query:', err);
         },
       });
   }
 
+  // Function to close the modal and reset the form
   closeModal(): void {
     this.isModalOpen = false;
     this.queryForm.reset(); // Reset form state when closing the modal.

@@ -1,4 +1,4 @@
-
+// Core Angular imports
 import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, ViewChild, ChangeDetectorRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -11,10 +11,12 @@ import { takeUntil } from 'rxjs/operators';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
+// Reuse service and models from bookings module
 import { BookingService } from '../bookings/booking.service';
 import { Booking, BookingsResponse } from '../bookings/models/booking.model';
 import { ConfirmationDialogComponent } from '../../shared/confirmation-dialog/confirmation-dialog';
 
+// Component for displaying confirmed bookings
 @Component({
   selector: 'app-confirmed-bookings',
   standalone: true,
@@ -49,12 +51,13 @@ export class ConfirmedBookingsComponent implements OnInit, OnDestroy, AfterViewI
     private toastr: ToastrService
   ) {}
 
+  // Load confirmed bookings on init
   ngOnInit(): void {
     this.loadBookings(false);
   }
 
+  // Ensure viewport is ready after view init
   ngAfterViewInit(): void {
-    // Check viewport after it's initialized
     setTimeout(() => {
       if (this.viewport) {
         this.viewport.checkViewportSize();
@@ -62,11 +65,13 @@ export class ConfirmedBookingsComponent implements OnInit, OnDestroy, AfterViewI
     }, 0);
   }
 
+  // Cleanup on destroy
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
 
+  // Load confirmed bookings with pagination
   loadBookings(append = true): void {
     if (this.loading) return;
     this.loading = true;
@@ -75,53 +80,46 @@ export class ConfirmedBookingsComponent implements OnInit, OnDestroy, AfterViewI
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response: BookingsResponse) => {
-          // console.log('API Response:', response);
-          
           if (response && response.bookings && Array.isArray(response.bookings)) {
             this.bookings = append ? [...this.bookings, ...response.bookings] : response.bookings;
             this.total = response.total || 0;
             
-            // console.log('Bookings array after update:', this.bookings);
-            // console.log('Total bookings:', this.total);
-            
-            // Force update of virtual scroll viewport after data is loaded
+            // Force virtual scroll to update its size
             setTimeout(() => {
               if (this.viewport) {
                 this.viewport.checkViewportSize();
-                // Also try to force a rerender
                 this.viewport.scrollToIndex(0);
               }
             }, 0);
           } else {
-            // console.error('Unexpected response format:', response);
             this.toastr.error('Unexpected data format received', 'Error');
           }
           
           this.loading = false;
-          this.cdr.markForCheck(); // Force change detection
+          this.cdr.markForCheck();
         },
         error: (err) => {
           this.loading = false;
           this.toastr.error('Error loading bookings', 'Error');
-          // console.error('API error: ', err);
           this.cdr.markForCheck();
         }
       });
   }
 
+  // Infinite scroll handler
   onScroll(): void {
     if (!this.viewport || this.loading) return;
     
     const end = this.viewport.getRenderedRange().end;
     const total = this.viewport.getDataLength();
     
-    // Load more when scrolled to the bottom
     if (end === total && this.bookings.length < this.total) {
       this.page++;
       this.loadBookings(true);
     }
   }
 
+  // Cancel a confirmed booking with reason
   cancelBooking(bookingId: number): void {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       data: { 
@@ -150,6 +148,7 @@ export class ConfirmedBookingsComponent implements OnInit, OnDestroy, AfterViewI
     });
   }
 
+  // Mark booking as completed
   completeBooking(bookingId: number): void {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       data: { 
@@ -176,7 +175,7 @@ export class ConfirmedBookingsComponent implements OnInit, OnDestroy, AfterViewI
     });
   }
 
-  // Add trackBy function for better virtual scroll performance
+  // Improve performance: Angular uses this to avoid re-rendering unchanged rows
   trackByBookingId(index: number, booking: Booking): number {
     return booking.bookingId;
   }

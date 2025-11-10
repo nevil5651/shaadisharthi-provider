@@ -9,6 +9,8 @@ import { VerifyEmailMessageComponent } from './verify-email-message';
 describe('VerifyEmailMessageComponent', () => {
   let component: VerifyEmailMessageComponent;
   let fixture: ComponentFixture<VerifyEmailMessageComponent>;
+
+  // Mock ActivatedRoute with fake query params
   const fakeActivatedRoute = {
     snapshot: {
       queryParamMap: convertToParamMap({ token: 'mock-token' })
@@ -18,12 +20,15 @@ describe('VerifyEmailMessageComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [VerifyEmailMessageComponent, HttpClientTestingModule, ToastrModule.forRoot()],
+      imports: [
+        VerifyEmailMessageComponent,
+        HttpClientTestingModule,
+        ToastrModule.forRoot()
+      ],
       providers: [
-        { provide: ActivatedRoute, useValue: fakeActivatedRoute as any }
+        { provide: ActivatedRoute, useValue: fakeActivatedRoute }
       ]
-    })
-    .compileComponents(); // Changed from VerifyEmailMessage to VerifyEmailMessageComponent
+    }).compileComponents();
 
     fixture = TestBed.createComponent(VerifyEmailMessageComponent);
     component = fixture.componentInstance;

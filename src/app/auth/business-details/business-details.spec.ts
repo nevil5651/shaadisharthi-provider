@@ -10,23 +10,25 @@ describe('BusinessDetailsComponent', () => {
   let component: BusinessDetailsComponent;
   let fixture: ComponentFixture<BusinessDetailsComponent>;
 
+  // Setup test environment before each test
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
-        BusinessDetailsComponent,
-        HttpClientTestingModule,
-        RouterTestingModule,
-        ToastrModule.forRoot(),
-        ReactiveFormsModule,
+        BusinessDetailsComponent,      // Standalone component
+        HttpClientTestingModule,       // Mock HTTP requests
+        RouterTestingModule,           // Mock routing
+        ToastrModule.forRoot(),        // Mock toast notifications
+        ReactiveFormsModule,           // For form testing
       ],
-    })
-    .compileComponents();
+    }).compileComponents();
 
+    // Create component instance
     fixture = TestBed.createComponent(BusinessDetailsComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    fixture.detectChanges();  // Trigger change detection
   });
 
+  // Basic test: component should be created
   it('should create', () => {
     expect(component).toBeTruthy();
   });

@@ -11,9 +11,13 @@ describe('WaitingApproval', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [WaitingApproval, HttpClientTestingModule, RouterTestingModule, ToastrModule.forRoot()]
-    })
-    .compileComponents();
+      imports: [
+        WaitingApproval,
+        HttpClientTestingModule,
+        RouterTestingModule,
+        ToastrModule.forRoot()
+      ]
+    }).compileComponents();
 
     fixture = TestBed.createComponent(WaitingApproval);
     component = fixture.componentInstance;

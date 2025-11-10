@@ -1,4 +1,6 @@
+<!-- Main content wrapper for the edit service page. -->
 <main id="main" class="main">
+  <!-- Page title and breadcrumb navigation. -->
   <div class="pagetitle">
     <h1>Edit Service</h1>
     <nav>
@@ -10,6 +12,7 @@
     </nav>
   </div>
 
+  <!-- Main section with loading spinner and conditional content. -->
   <section class="section">
     <!-- Loading Spinner -->
     <div *ngIf="isLoading$ | async" class="d-flex justify-content-center my-5">
@@ -18,13 +21,15 @@
       </div>
     </div>
 
+    <!-- Container for when loading is complete. -->
     <ng-container *ngIf="(isLoading$ | async) === false">
       <div class="card" *ngIf="service$ | async; else notFound">
         <div class="card-body">
           <h5 class="card-title">Edit Service Details</h5>
 
+          <!-- Reactive form for editing service details. -->
           <form [formGroup]="serviceForm" (ngSubmit)="onSubmit()" novalidate>
-            <!-- Service Name -->
+            <!-- Service Name input. -->
             <div class="row mb-3">
               <label for="name" class="col-sm-2 col-form-label">Service Name</label>
               <div class="col-sm-10">
@@ -37,7 +42,7 @@
               </div>
             </div>
 
-            <!-- Category -->
+            <!-- Category input. -->
             <div class="row mb-3">
               <label for="category" class="col-sm-2 col-form-label">Category</label>
               <div class="col-sm-10">
@@ -49,7 +54,7 @@
               </div>
             </div>
 
-            <!-- Description -->
+            <!-- Description textarea. -->
             <div class="row mb-3">
               <label for="description" class="col-sm-2 col-form-label">Description</label>
               <div class="col-sm-10">
@@ -62,7 +67,7 @@
               </div>
             </div>
 
-            <!-- Price -->
+            <!-- Price input. -->
             <div class="row mb-3">
               <label for="price" class="col-sm-2 col-form-label">Price</label>
               <div class="col-sm-10">
@@ -75,11 +80,10 @@
               </div>
             </div>
 
-            <!-- Media Management -->
-            <div class="row mb-3">
-              <label class="col-sm-2 col-form-label">Manage Media</label>
+            <!-- Media section: Existing media previews and upload input. -->
+            <div class="row mb-3" >
+              <label class="col-sm-2 col-form-label">Media</label>
               <div class="col-sm-10">
-                <!-- Existing Media Preview -->
                 <div class="d-flex flex-wrap gap-2 mb-3" formArrayName="media" *ngIf="media.controls.length > 0">
                   <div *ngFor="let mediaControl of media.controls; let i = index" [formGroupName]="i" class="position-relative">
                     <ng-container [ngSwitch]="mediaControl.get('type')?.value">
@@ -105,7 +109,7 @@
               </div>
             </div>
 
-            <!-- Form Actions -->
+            <!-- Form Actions: Save, Cancel, Delete buttons. -->
             <div class="row mb-3">
               <div class="col-sm-10 offset-sm-2">
                 <button type="submit" class="btn btn-primary" [disabled]="isSubmitting || isUploading">
@@ -114,13 +118,12 @@
                 </button>
                 <a routerLink="/services" class="btn btn-secondary ms-2">Cancel</a>
                 <button type="button" (click)="deleteService()" class="btn btn-danger ms-2" [disabled]="isLoading$ | async">
-            <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-            Delete Service
-          </button>
+                  <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                  Delete Service
+                </button>
               </div>
             </div>
           </form>
-
         </div>
       </div>
     </ng-container>

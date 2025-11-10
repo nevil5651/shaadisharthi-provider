@@ -14,42 +14,55 @@ import { VerifyEmailMessageComponent } from './auth/verify-email-message/verify-
 import { RoleGuard } from './core/guards/role-guard';
 import { WaitingApproval } from './auth/waiting-approval/waiting-approval';
 import { FaqsComponent } from './pages/faqs/faqs';
-// import { UnauthorizedComponent } from './auth/unauthorized/unauthorized';
 
+// This file defines ALL routes in Councils the app
+// Uses two layouts:
+//   1. MainLayout → for logged-in users (sidebar, header)
+//   2. EmptyLayout → for public/auth pages (no layout)
 export const routes: Routes = [
+
+  // ===================== PROTECTED ROUTES (Logged-in + Approved) =====================
   {
     path: '',
-    component: MainLayout,  // Protected layout
-    canActivate: [AuthGuard, RoleGuard],
-    data: { roles: ['SERVICE_PROVIDER'], status: 'APPROVED' },
+    component: MainLayout,  // Layout with sidebar, navbar, etc.
+    canActivate: [AuthGuard, RoleGuard],  // Must be logged in + correct role/status
+    data: { roles: ['SERVICE_PROVIDER'], status: 'APPROVED' },  // Only approved providers
     children: [
-      { path: 'dashboard', component: Dashboard },
+      { path: 'dashboard', component: Dashboard },  // Home dashboard
       {
         path: 'services',
         loadChildren: () => import('./modules/provider/services/services-module').then(m => m.ServicesModule)
+        // Lazy-loaded module for managing services
       },
       {
         path: 'bookings',
         loadChildren: () => import('./features/bookings/bookings.routes').then(r => r.BOOKINGS_ROUTES)
+        // Lazy-loaded bookings module
       },
-      { path: 'account', component: Account },
-      { path: 'faqs', component: FaqsComponent, title: 'FAQs' },
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
+      { path: 'account', component: Account },  // Profile settings
+      { path: 'faqs', component: FaqsComponent, title: 'FAQs' },  // Help page
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }  // Default redirect
     ]
   },
+
+  // ===================== PUBLIC / AUTH ROUTES (No layout) =====================
   {
     path: '',
-    component: EmptyLayout,  // Public layout
+    component: EmptyLayout,  // Clean, full-screen layout
     children: [
       { path: 'login', component: LoginComponent },
       { path: 'register', component: RegisterComponent, title: 'Register Provider' },
+      
+      // Business details — only for partially registered users
       {
         path: 'business-details',
         component: BusinessDetailsComponent,
         title: 'Business Details',
         canActivate: [AuthGuard, RoleGuard],
-        data: { roles: ['SERVICE_PROVIDER'], status: 'BASIC_REGISTERED' }
+        data: { roles: ['SERVICE_PROVIDER'], status: 'BASIC_REGISTERED' }  // After email + password
       },
+      
+      // Waiting page — only for pending users
       {
         path: 'waiting-approval',
         component: WaitingApproval,
@@ -57,16 +70,17 @@ export const routes: Routes = [
         canActivate: [AuthGuard, RoleGuard],
         data: { roles: ['SERVICE_PROVIDER'], status: 'PENDING_APPROVAL' }
       },
-      // {
-      //   path: 'unauthorized',
-      //   component: UnauthorizedComponent,
-      //   title: 'Unauthorized'
-      // },
+
+      // Password recovery
       { path: 'forgot-password', component: ForgotPasswordComponent, title: 'Forgot Password' },
       { path: 'reset-password', component: ResetPasswordComponent, title: 'Reset Password' },
+
+      // Email verification flow
       { path: 'email-verification', component: EmailVerificationComponent, title: 'Email Verification' },
       { path: 'verify-email-message', component: VerifyEmailMessageComponent, title: 'Verify Email Message' },
     ]
   },
-  { path: '**', redirectTo: 'login' }  // 404 handling
+
+  // Catch-all: redirect unknown paths to login
+  { path: '**', redirectTo: 'login' }
 ];

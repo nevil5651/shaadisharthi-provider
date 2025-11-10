@@ -5,9 +5,15 @@ It allows service providers (e.g., photographers, caterers, decorators) to regis
 
 > ⚠️ Note: This repo only contains the **Service Provider Frontend** (Angular + Bootstrap).  
 > The platform also has:  
-> - **Admin frontend** (separate repo)  
-> - **Customer frontend** (separate repo)  
-> - **Java Backend** (separate repo, built with Servlets)  
+> - **Admin frontend** (github.com/nevil5651/shaadisharthi-admin)  
+> - **Customer frontend** (github.com/nevil5651/shaadisharthi-customer)  
+> - **Java Backend** (github.com/nevil5651/shaadisharthi-backend, built with Servlets)  
+
+
+---
+
+## Live demo & repos
+- **Live Demo URL**: `https://shaadisharthi.theworkpc.com/provider`
 
 ---
 
@@ -125,7 +131,7 @@ export const environment = {
 ```bash
 ng serve
 ```
-Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Navigate to `http://localhost:4200/provider`. The app will automatically reload if you change any of the source files.
 
 ---
 
@@ -137,3 +143,21 @@ Navigate to `http://localhost:4200/`. The app will automatically reload if you c
 - **Robust Media Uploading**: Add file size limits, better error handling, and MIME type validation.
 - **Real-time Notifications**: Use WebSockets for instant booking updates.
 - **Advanced Analytics**: Introduce trends, financial forecasting, and customer retention insights.
+
+---
+
+## 👨‍💻 Contact
+
+-   **Author**: Nevil H. — Full Stack Developer (Java + Modern JS Frameworks)
+-   **Email**: nevilhapaliya565188@example.com
+-   **GitHub**: github.com/nevil5651
+
+---
+
+## 📜 License
+
+-   This repository is provided for portfolio and educational purposes.
+
+---
+Built with ❤️ for the wedding industry
+

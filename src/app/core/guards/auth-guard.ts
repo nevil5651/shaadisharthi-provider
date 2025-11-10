@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { filter, map, take } from 'rxjs/operators';
 import { AuthService } from '../services/auth';
 
+// Prevents access to routes if user is not logged in
 @Injectable({
   providedIn: 'root'
 })
@@ -12,15 +13,19 @@ export class AuthGuard implements CanActivate {
 
   canActivate(
     route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot): Observable<boolean | UrlTree> {
-    return this.authService.isInitialized$.pipe( // Wait until initialization is complete
-      filter(isInitialized => isInitialized),
-      take(1), // Take the first `true` value, then complete the stream
+    state: RouterStateSnapshot
+  ): Observable<boolean | UrlTree> {
+    return this.authService.isInitialized$.pipe(
+      filter(isInitialized => isInitialized),  // Wait until AuthService is ready
+      take(1),  // Only take first emission
       map(() => {
         if (this.authService.isAuthenticated()) {
-          return true;
+          return true;  // Allow access
         }
-        return this.router.createUrlTree(['/login'], { queryParams: { returnUrl: state.url }});
+        // Not logged in → redirect to login with return URL
+        return this.router.createUrlTree(['/login'], { 
+          queryParams: { returnUrl: state.url } 
+        });
       })
     );
   }

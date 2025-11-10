@@ -5,14 +5,16 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { BookingsResponse } from './models/booking.model';
  
-// Assume environment file exists
+// Use environment file for API base URL (dev/prod switching)
 import { environment } from '../../../environments/environment';
 
+// Service is provided at root level — available app-wide
 @Injectable({
   providedIn: 'root'
 })
 export class BookingService {
 
+  // Base API URL from environment (fallback to localhost)
   private apiUrl = environment.apiUrl || 'http://localhost:3000/api';
 
   constructor(private http: HttpClient) {}
@@ -31,7 +33,7 @@ export class BookingService {
 
     return this.http.get<BookingsResponse>(`${this.apiUrl}/ServiceProvider/booking-list-servlet`, { params })
       .pipe(
-        catchError(this.handleError)
+        catchError(this.handleError)  // Handle any HTTP errors
       );
   }
 

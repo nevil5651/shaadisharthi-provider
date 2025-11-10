@@ -1,3 +1,5 @@
+// Component for viewing service details, including media tabs.
+
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
@@ -5,6 +7,7 @@ import { Observable, tap } from 'rxjs';
 import { Media, Service } from '../../models/service.model';
 import { ServiceStateService } from '../../services/service-state.service';
 
+// Defining the component as standalone.
 @Component({
   selector: 'app-view-service',
   standalone: true,
@@ -13,9 +16,11 @@ import { ServiceStateService } from '../../services/service-state.service';
   styleUrls: ['./view-service.scss']
 })
 export class ViewServiceComponent implements OnInit {
+  // Injecting route and state service.
   private readonly route = inject(ActivatedRoute);
   private readonly serviceState = inject(ServiceStateService);
 
+  // Observables for service and loading.
   public readonly service$: Observable<Service | null>;
   public readonly isLoading$: Observable<boolean>;
 
@@ -24,6 +29,7 @@ export class ViewServiceComponent implements OnInit {
     this.isLoading$ = this.serviceState.isLoading$;
   }
 
+  // Lifecycle hook to load service based on route ID.
   ngOnInit(): void {
     // Using the observable paramMap is more robust than the snapshot.
     this.route.paramMap.pipe(tap(params => {
@@ -32,6 +38,7 @@ export class ViewServiceComponent implements OnInit {
     })).subscribe();
   }
 
+  // Helper method to filter media by type.
   public getMediaByType(media: Media[] | undefined | null, type: 'image' | 'video'): Media[] {
     if (!media) {
       return [];

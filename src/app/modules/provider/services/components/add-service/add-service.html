@@ -1,4 +1,8 @@
+<!-- Main content wrapper for the add service page. -->
+
 <main id="main" class="main">
+
+  <!-- Page title and breadcrumb navigation. -->
   <div class="pagetitle">
     <h1>Add Service</h1>
     <nav>
@@ -10,13 +14,14 @@
     </nav>
   </div>
 
+  <!-- Main section containing the form card. -->
   <section class="section">
     <div class="card">
       <div class="card-body">
         <h5 class="card-title">New Service Details</h5>
-
+        <!-- Reactive form bound to serviceForm, submits on ngSubmit. -->
         <form [formGroup]="serviceForm" (ngSubmit)="onSubmit()" novalidate>
-          <!-- Service Name -->
+          <!-- Service Name input field with validation. -->
           <div class="row mb-3">
             <label for="name" class="col-sm-2 col-form-label">Service Name</label>
             <div class="col-sm-10">
@@ -29,7 +34,7 @@
             </div>
           </div>
 
-          <!-- Category -->
+          <!-- Category input field with validation. -->
           <div class="row mb-3">
             <label for="category" class="col-sm-2 col-form-label">Category</label>
             <div class="col-sm-10">
@@ -41,7 +46,7 @@
             </div>
           </div>
 
-          <!-- Description -->
+          <!-- Description textarea with validation. -->
           <div class="row mb-3">
             <label for="description" class="col-sm-2 col-form-label">Description</label>
             <div class="col-sm-10">
@@ -54,7 +59,7 @@
             </div>
           </div>
 
-          <!-- Price -->
+          <!-- Price input field with validation. -->
           <div class="row mb-3">
             <label for="price" class="col-sm-2 col-form-label">Price</label>
             <div class="col-sm-10">
@@ -67,7 +72,7 @@
             </div>
           </div>
 
-          <!-- Media Upload -->
+          <!-- Media Upload input for adding images/videos. -->
           <div class="row mb-3">
             <label for="mediaFile" class="col-sm-2 col-form-label">Add Media</label>
             <div class="col-sm-10">
@@ -78,7 +83,7 @@
             </div>
           </div>
 
-          <!-- Media Preview -->
+          <!-- Media Preview section, showing uploaded media with remove buttons. -->
           <div class="row mb-3" formArrayName="media" *ngIf="media.controls.length > 0">
             <label class="col-sm-2 col-form-label">Uploaded Media</label>
             <div class="col-sm-10">
@@ -96,7 +101,7 @@
             </div>
           </div>
 
-          <!-- Form Actions -->
+          <!-- Form Actions: Submit, Cancel buttons. -->
           <div class="row mb-3">
             <div class="col-sm-10 offset-sm-2">
               <button type="submit" class="btn btn-primary" [disabled]="isSubmitting || isUploading">
@@ -107,8 +112,8 @@
             </div>
           </div>
         </form>
-
       </div>
     </div>
   </section>
+
 </main>
